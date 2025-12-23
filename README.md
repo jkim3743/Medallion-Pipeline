@@ -33,3 +33,83 @@ Open notebook: **`01_bronze_ingest`**
 
 Output:
 - Delta table: `bronze_servicenow_incidents`
+
+---
+
+### 2) Run Silver
+Open notebook: **`02_silver_clean_transform`**
+- Normalizes column names (safe/consistent naming)
+- Removes invalid records (missing/blank `sys_id`)
+- Converts date strings (`opened_at`, `closed_at`) into timestamps (`opened_at_ts`, `closed_at_ts`)
+  - Uses tolerant parsing (`try_to_timestamp`) + multiple patterns to handle inconsistent formats
+- Writes cleaned data to a Delta Silver table
+- Validates key constraints and parsing success
+
+Output:
+- Delta table: `silver_servicenow_incidents`
+
+---
+
+### 3) Run Gold
+Open notebook: **`03_gold_analytics`**
+- Aggregates ticket counts by status and priority
+  - In this dataset, `state` is used as ticket status
+- Writes Gold output as a Delta table
+
+Output:
+- Delta table: `gold_ticket_counts_by_state_priority`
+
+---
+
+
+## Data model / tables
+
+### Bronze: `bronze_servicenow_incidents`
+- Raw landing zone
+- Preserves source fields as-is
+- Adds ingestion metadata columns:
+  - `_ingest_ts`
+  - `_source_file`
+
+### Silver: `silver_servicenow_incidents`
+- Cleaned + standardized
+- Key rule:
+  - Filter out invalid records where `sys_id` is null/empty
+- Timestamp parsing:
+  - `opened_at_ts`, `closed_at_ts` created from string fields
+  - Tolerant parsing handles mixed formats like:
+    - `6/5/2025 13:10`
+    - `2/15/2025 3:21`
+
+### Gold: `gold_ticket_counts_by_state_priority`
+- Aggregated analytics-ready table
+- Metric:
+  - `ticket_count` grouped by `state` (status) and `priority`
+
+---
+
+## How to validate outputs quickly
+
+Run these in a notebook:
+
+```python
+# Bronze
+spark.table("bronze_servicenow_incidents").count()
+spark.table("bronze_servicenow_incidents").printSchema()
+
+# Silver
+spark.table("silver_servicenow_incidents").count()
+spark.table("silver_servicenow_incidents").printSchema()
+
+# Gold
+display(spark.table("gold_ticket_counts_by_state_priority").orderBy("ticket_count", ascending=False))
+
+---
+
+## Tech used
+
+1. Databricks (Spark / PySpark)
+
+2. Delta Lake tables (Bronze/Silver/Gold)
+
+
