@@ -88,6 +88,32 @@ Output:
 
 ---
 
+## Design decisions (and why)
+
+### 1) Why Medallion Architecture
+- **Bronze** = raw, replayable source of truth
+- **Silver** = enforce data quality + correct types
+- **Gold** = business-ready aggregates for reporting
+
+This separation makes the pipeline easier to debug, safer to evolve, and more production-aligned.
+
+### 2) Preserve schema in Bronze
+Bronze does not rename or clean business columns.  
+Only ingestion metadata is added (standard practice for lineage and debugging).
+
+### 3) Data quality rule (invalid records)
+I treated `sys_id` as the primary identifier for ServiceNow incidents and removed records where it is missing/blank.  
+This prevents unreliable joins and incorrect aggregations downstream.
+
+### 4) Timestamp parsing strategy
+The dataset contained inconsistent timestamp formats. A strict single-format parse caused runtime failures.  
+In Silver, I used tolerant parsing with multiple patterns to avoid failing the pipeline and to keep the system robust.
+
+### 5) Databricks Free Edition constraints
+Direct Spark reads from Workspace Files/DBFS paths were restricted in this environment (Public DBFS root disabled / read errors).  
+To make ingestion reliable, I used Databricks **Add Data → Create Table** and then read from that table.
+
+---
 ## How to validate outputs quickly
 
 Run these in a notebook:
