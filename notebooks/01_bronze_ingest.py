@@ -1,4 +1,9 @@
 # Databricks notebook source
+# 01_bronze_ingest
+# Goal:
+# 1) Load raw data into a Bronze Delta table
+# 2) Preserve schema as-is (no casting / no transformations)
+
 BRONZE_TABLE = "bronze_servicenow_incidents"
 
 df_raw = spark.table("workspace.default.servicenow_incidents_10_k")

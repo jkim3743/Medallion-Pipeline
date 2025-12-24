@@ -1,4 +1,10 @@
 # Databricks notebook source
+# 03_gold_analytics
+# Goal:
+# 1) Create an aggregated view:
+# 2) Count tickets by status and priority.
+# 3) Save as a Delta table or CSV.
+
 from pyspark.sql import functions as F
 
 # Read Silver
@@ -10,6 +16,7 @@ print("Silver rows:", df_silver.count())
 
 
 # COMMAND ----------
+
 
 # Aggregate: count tickets by state and priority
 df_gold = (

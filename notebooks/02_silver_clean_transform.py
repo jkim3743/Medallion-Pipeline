@@ -1,4 +1,12 @@
 # Databricks notebook source
+# 02_silver_clean_transform
+# Goal:
+# 1) Clean and transform:
+# 2) Normalize column names.
+# 3) Remove invalid records (e.g., missing ticket_id).
+# 4) Convert date fields to proper timestamp format.
+# 5) Save as Delta table or parquet.
+
 from pyspark.sql import functions as F
 
 # Read from the bronze table
