@@ -14,7 +14,7 @@ Goal: show how I ingest raw data, clean/transform it, and produce an aggregated 
 ## How to run the pipeline
 
 ### 0) Upload data
-In Databricks (Free Edition):
+In Databricks:
 1. **New → File (Add data)**
 2. Upload `servicenow_incidents_10k.csv`
 3. Choose **Create Table**
