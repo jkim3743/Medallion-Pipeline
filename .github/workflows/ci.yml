@@ -29,5 +29,4 @@ jobs:
 
       - name: Run tests (pytest)
         run: |
-          python -m pytest -q
-
+          PYTHONPATH=src python -m pytest -q
